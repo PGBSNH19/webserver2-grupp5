@@ -38,8 +38,9 @@ namespace webserverapp
             listener.Start();
             Console.WriteLine("Listening...");
 
-            int counter = 1;
 
+            Cookie counterCookie = new Cookie();
+            int cookies = 0;
             while (true)
             {
                 string extra = "";
@@ -58,33 +59,47 @@ namespace webserverapp
                     if (context.Request.RawUrl.Contains(@"/Subfolder/"))
                     {
                         extra = @"\index.html";
+                        response.AppendCookie(counterCookie);
+                        cookies += response.Cookies.Count;
                     }
 
                     if (context.Request.RawUrl.Contains("counter"))
                     {
-                        string responseString = $"<HTML><BODY> Amount of requests: {counter} </BODY></HTML>";
+                        string responseString = $"<HTML><BODY> Amount of requests: {cookies} </BODY></HTML>";
 
                         byte[] buffer1 = System.Text.Encoding.UTF8.GetBytes(responseString);
                         response.ContentLength64 = buffer1.Length;
                         System.IO.Stream output = response.OutputStream;
                         output.Write(buffer1, 0, buffer1.Length);
+
+                        response.AppendCookie(counterCookie);
+                        cookies += response.Cookies.Count;
+
                         output.Close();
                         Console.WriteLine("Request sent" + request.RawUrl);
-                        counter++;
-                        Console.WriteLine("amount of requests: " + counter);
+
+                        Console.WriteLine("amount of requests: " + cookies);
                     }
                     else
                     {
 
                         byte[] buffer = File.ReadAllBytes(@"C:\Dataåtkomster\webserver2-grupp5\Content" + context.Request.RawUrl.Replace("%20", " ") + extra);
 
+
+
+
+
+                        response.AppendCookie(counterCookie);
+                        cookies += response.Cookies.Count;
+
                         response.ContentLength64 = buffer.Length;
                         System.IO.Stream output = response.OutputStream;
                         output.Write(buffer, 0, buffer.Length);
                         output.Close();
                         Console.WriteLine("Request sent" + request.RawUrl);
-                        counter++;
-                        Console.WriteLine("amount of requests: " + counter);
+
+
+                        Console.WriteLine("amount of requests: " + cookies);
                     }
                 }
                 //byte[] buffer = File.ReadAllBytes(@"C:\Dataåtkomster\webserver2-grupp5" + context.Request.RawUrl.Replace("%20", " "));
